@@ -1,7 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const { v4: uuid } = require("uuid");
-const { generateFile } = require("./controller/generateFile.js");
+const { generateFile } = require("./controller/generateFile");
+const { executeCpp } = require("./controller/executeCpp");
 
 const app = express();
 
@@ -18,19 +19,29 @@ app.get("/", (req, res) => {
 
 app.post("/run", async (req, res) => {
   const { lang = "cpp", code } = req.body;
-  if (code === undefined) {
-    return res.status(500).json({ success: false, message: "Empty Code Body" });
+  if (!code) {
+    return res.status(400).json({ success: false, message: "Empty Code Body" });
   }
+
   try {
-    // we are getting two things from frontend lang and code
-    // we'll need to create a file containing that file using FS and
-    // then copy the code inside the file
-    // and use the lang create a file of that particular extension
-    const pathFile = await generateFile(lang, code);
-    // res.send(pathFile);
+    // Create file and write code to it
+    const filePath = await generateFile(lang, code);
+    let output;
+
+    // Compile and run the code
+    if (lang === "cpp") {
+      output = await executeCpp(filePath);
+    }
+
+    // Add more language support here
+    // if (lang === "python") {
+    //   output = await executePython(filePath);
+    // }
+
+    res.json({ filePath, output, message: "success" });
   } catch (error) {
     console.log("Error while running code: ", error.message);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server error", details: error });
   }
 });
 
