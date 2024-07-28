@@ -4,6 +4,7 @@ const { v4: uuid } = require("uuid");
 const { generateFile } = require("./controller/generateFile");
 const { executeCpp } = require("./controller/executeCpp");
 const { executePython } = require("./controller/executePython");
+const { executeJs } = require("./controller/executeJs");
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.post("/run", async (req, res) => {
       output = await executeCpp(filePath);
     } else if (lang === "py") {
       output = await executePython(filePath);
+    } else if (lang == "js") {
+      output = await executeJs(filePath);
     }
 
     res.json({ filePath, output, message: "success" });
