@@ -21,6 +21,7 @@ const generateFile = async (lang, code) => {
   // inside the codes folder
   const filePath = path.join(dirCodes, fileName);
   if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, code);
+  else generateFile(lang, code);
   return filePath;
 };
 

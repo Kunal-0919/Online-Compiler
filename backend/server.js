@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const { v4: uuid } = require("uuid");
 const { generateFile } = require("./controller/generateFile");
 const { executeCpp } = require("./controller/executeCpp");
+const { executePython } = require("./controller/executePython");
 
 const app = express();
 
@@ -31,12 +32,9 @@ app.post("/run", async (req, res) => {
     // Compile and run the code
     if (lang === "cpp") {
       output = await executeCpp(filePath);
+    } else if (lang === "py") {
+      output = await executePython(filePath);
     }
-
-    // Add more language support here
-    // if (lang === "python") {
-    //   output = await executePython(filePath);
-    // }
 
     res.json({ filePath, output, message: "success" });
   } catch (error) {
